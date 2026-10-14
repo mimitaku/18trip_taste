@@ -1,0 +1,732 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#4def00">
+  <title>18TRIP 취향표</title>
+  <style>
+    :root {
+      --accent: rgb(77, 239, 0);
+      --accent-dark: #287c0a;
+      --bg: #f0f1ef;
+      --paper: #ffffff;
+      --ink: #171916;
+      --muted: #73776f;
+      --line: #e0e2dc;
+      --soft-green: #efffe8;
+      --radius: 20px;
+      font-family: Pretendard, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; color: var(--ink); background: var(--bg); font-size:16px; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    .page { max-width: 1440px; margin: 0 auto; padding: 28px 30px 56px; }
+    .topbar { display:flex; align-items:center; justify-content:space-between; gap:18px; margin-bottom:26px; }
+    .brand { display:flex; align-items:center; gap:0; min-width:0; }
+    .eyebrow { font-size:11px; font-weight:900; letter-spacing:2.4px; color:#6b7068; }
+    h1 { margin:3px 0 0; font-size:clamp(25px, 3vw, 38px); line-height:1.07; letter-spacing:-1.7px; }
+    .top-actions { display:flex; align-items:center; gap:9px; }
+    .quiet-pill { padding:10px 13px; border:1px solid #dfe1db; border-radius:999px; color:#5a5f56; font-size:12px; font-weight:800; background:#fafbf9; white-space:nowrap; }
+    .hero { position:relative; overflow:hidden; background:var(--ink); color:#fff; border-radius:26px; padding:27px 30px; margin-bottom:24px; display:flex; justify-content:space-between; align-items:center; gap:22px; }
+    .hero:after { content:none; }
+    .hero-copy, .progress-wrap { position:relative; z-index:1; }
+     .hero .mini-label { display:inline-flex; padding:6px 10px; color:#151713; background:var(--accent); border-radius:6px; font-size:12px; font-weight:1000; letter-spacing:1.4px; }
+     .hero h2 { margin:12px 0 8px; font-size:clamp(24px, 2.8vw, 34px); letter-spacing:-1px; }
+    .hero p { margin:0; color:#c1c7bd; font-size:15px; line-height:1.7; }
+    .progress-wrap { width:min(280px, 35%); min-width:180px; }
+    .progress-label { display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:14px; color:#d8ded5; font-weight:800; margin-bottom:10px; }
+    .progress-label strong { color:var(--accent); font-size:20px; }
+    .progress-track { height:9px; background:#393d36; border-radius:99px; overflow:hidden; }
+    .progress-bar { width:0%; height:100%; background:var(--accent); transition:width .25s ease; border-radius:99px; }
+    .workspace { display:grid; grid-template-columns:minmax(0, 1.55fr) minmax(320px, .85fr); align-items:start; gap:24px; }
+    .selector-panel, .preview-panel { min-width:0; }
+    .panel-heading { display:flex; align-items:end; justify-content:space-between; gap:14px; margin:0 0 14px; }
+    .panel-heading h2 { margin:0; font-size:23px; letter-spacing:-.7px; }
+    .panel-heading p { margin:6px 0 0; color:var(--muted); font-size:14px; }
+    .search-box { width:190px; max-width:45%; position:relative; }
+    .search-box input { width:100%; border:1px solid var(--line); border-radius:12px; background:#fff; padding:12px 13px 12px 35px; outline:none; font-size:15px; }
+    .search-box input:focus, .title-input:focus, .custom-input:focus { border-color:#89eb69; box-shadow:0 0 0 3px rgba(77,239,0,.12); }
+    .search-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#7c8177; font-size:15px; }
+    #group-container { display:flex; flex-direction:column; gap:15px; }
+    .group-card { background:var(--paper); border:1px solid #e5e7e1; border-radius:var(--radius); padding:18px; box-shadow:0 3px 12px rgba(25,30,20,.025); }
+    .group-head { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:15px; }
+    .group-name-wrap { display:flex; align-items:center; gap:10px; min-width:0; }
+    .group-index { flex:none; width:38px; height:38px; border-radius:11px; display:grid; place-items:center; background:#f0f2ed; font-size:12px; font-weight:1000; letter-spacing:-.2px; }
+    .group-name { margin:0; font-size:20px; letter-spacing:-.45px; }
+    .group-sub { display:none; }
+    .pick-state { flex:none; padding:7px 10px; border-radius:99px; background:#f2f3f0; color:#72766f; font-size:12px; font-weight:900; }
+    .pick-state.done { background:var(--soft-green); color:#287c0a; }
+    .character-grid { display:grid; grid-template-columns:repeat(5, minmax(0, 1fr)); gap:11px; }
+    .character-card { position:relative; min-width:0; text-align:left; padding:7px 7px 10px; background:#fff; border:1px solid #e8eae5; border-radius:13px; color:var(--ink); transition:border-color .16s, background .16s, transform .16s, box-shadow .16s; }
+    .character-card:hover { transform:translateY(-2px); border-color:#b4eaa4; box-shadow:0 5px 12px rgba(40,124,10,.08); }
+    .character-card.selected { background:#f5fff0; border:2px solid var(--accent); padding:6px 6px 9px; box-shadow:0 0 0 2px rgba(77,239,0,.12); }
+    .check-dot { display:none; position:absolute; top:11px; right:11px; z-index:2; width:21px; height:21px; border-radius:50%; place-items:center; background:var(--accent); border:2px solid #fff; color:#111; font-size:13px; font-weight:1000; }
+    .character-card.selected .check-dot { display:grid; }
+    .portrait { position:relative; display:block; aspect-ratio:4/4.6; width:100%; overflow:hidden; border-radius:8px; background:linear-gradient(145deg, #e8eee4, #f5f6f1 54%, #e4ebdf); margin-bottom:9px; }
+    .portrait img { width:100%; height:100%; display:block; object-fit:cover; }
+    .portrait-placeholder { position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:8px; color:#5d6855; background:radial-gradient(circle at 80% 18%, rgba(77,239,0,.22), transparent 38%), linear-gradient(145deg,#edf2e8,#f7f8f5); }
+    .placeholder-monogram { width:44px; height:44px; border-radius:14px; display:grid; place-items:center; background:rgba(77,239,0,.65); color:#172012; border:1px solid rgba(28,70,9,.16); font-size:14px; font-weight:1000; letter-spacing:-.5px; }
+    .placeholder-caption { font-size:10px; font-weight:900; letter-spacing:1px; }
+    .char-ko { display:block; min-height:2.6em; font-size:13px; line-height:1.4; font-weight:900; letter-spacing:-.3px; word-break:keep-all; }
+    .char-en { display:block; margin-top:5px; min-height:2.5em; color:#858a81; font-size:10px; line-height:1.35; font-weight:750; letter-spacing:.15px; overflow-wrap:anywhere; }
+    .char-en:empty { display:none; }
+    .custom-fields { display:none; margin-top:14px; padding:14px; border-radius:14px; background:#f8faf6; border:1px dashed #cdd4c7; }
+    .custom-fields.visible { display:block; }
+    .custom-fields label { display:block; font-size:13px; font-weight:900; margin:0 0 6px; }
+    .custom-input { width:100%; min-width:0; padding:12px; border:1px solid #dfe3da; border-radius:10px; background:#fff; margin-bottom:10px; font-size:15px; outline:none; }
+    .custom-help { margin:0; color:#7b8176; font-size:12px; line-height:1.6; }
+    .empty-search { display:none; border:1px dashed #d3d8ce; border-radius:14px; padding:24px; color:#70766b; background:#fafbf9; text-align:center; font-size:15px; }
+    .preview-sticky { position:sticky; top:16px; }
+    .preview-card { padding:18px; border:1px solid #e4e6df; border-radius:var(--radius); background:#fff; box-shadow:0 5px 20px rgba(25,30,20,.035); }
+    .preview-topline { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:13px; }
+    .preview-topline h2 { margin:0; font-size:20px; letter-spacing:-.5px; }
+    .live-badge { font-size:11px; font-weight:1000; letter-spacing:1px; background:#f0f2ee; border-radius:6px; padding:6px 7px; color:#53594f; }
+    .self-panel { background:var(--paper); border:1px solid #e5e7e1; border-radius:var(--radius); padding:18px; margin-bottom:15px; box-shadow:0 3px 12px rgba(25,30,20,.025); }
+    .self-panel-title { margin:0; font-size:20px; letter-spacing:-.45px; }
+    .self-panel-description { margin:6px 0 16px; color:var(--muted); font-size:13px; line-height:1.5; }
+    .self-nickname-label { display:block; font-size:13px; font-weight:900; margin-bottom:6px; }
+    .self-nickname-input { width:100%; border:1px solid #dfe3da; border-radius:10px; background:#fff; padding:13px 12px; font-size:15px; outline:none; margin-bottom:14px; }
+    .self-nickname-input:focus { border-color:#89eb69; box-shadow:0 0 0 3px rgba(77,239,0,.12); }
+    .self-choice-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+    .self-choice { display:flex; align-items:center; gap:10px; min-width:0; border:1px solid #e4e8df; background:#fff; border-radius:13px; padding:8px; text-align:left; color:var(--ink); }
+    .self-choice.selected { border:2px solid var(--accent); padding:7px; background:#f5fff0; box-shadow:0 0 0 2px rgba(77,239,0,.1); }
+    .self-choice .self-choice-photo { flex:none; width:58px; aspect-ratio:4/4.6; border-radius:8px; overflow:hidden; background:#eef1ea; position:relative; }
+    .self-choice-photo img { width:100%; height:100%; display:block; object-fit:cover; }
+    .self-choice .portrait-placeholder { gap:4px; }
+    .self-choice .placeholder-monogram { width:30px; height:30px; border-radius:10px; font-size:10px; }
+    .self-choice .placeholder-caption { font-size:6px; }
+    .self-choice-name { min-width:0; font-size:13px; line-height:1.35; font-weight:900; word-break:keep-all; }
+    .title-input { width:100%; border:1px solid #e0e3dc; border-radius:10px; padding:10px 12px; font-size:12px; outline:none; margin-bottom:13px; }
+    .sheet { background:#f0f1ef; border:1px solid #e5e7e1; padding:14px; border-radius:14px; overflow:hidden; }
+    .sheet-banner { display:flex; justify-content:flex-start; align-items:center; gap:8px; border-bottom:2px solid var(--accent); padding:0 0 10px; margin-bottom:11px; }
+    .sheet-heading-content { display:flex; align-items:center; gap:10px; flex:1; min-width:0; }
+    .sheet-title { flex:1; min-width:0; margin:0; font-weight:1000; font-size:24px; letter-spacing:-1.2px; line-height:1.15; overflow-wrap:anywhere; }
+    .mini-profile { display:flex; align-items:center; gap:6px; margin-top:7px; min-width:0; }
+    .mini-profile-photo { position:relative; flex:none; display:block; width:38px; height:44px; overflow:hidden; border-radius:7px; background:#e8eee4; border:1px solid #dce4d6; }
+    .mini-profile-photo img { display:block; width:100%; height:100%; object-fit:cover; }
+    .mini-profile-placeholder { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#52624a; background:#eff5e9; font-size:9px; font-weight:1000; }
+    .result-item.self-result { border-color:#bceba9; background:#f8fff4; }
+    .result-item.self-result .result-group { color:#287c0a; }
+    .result-grid { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:7px; }
+    .result-item { min-width:0; background:#fff; border:1px solid #e2e4de; border-radius:9px; padding:6px; text-align:center; overflow:hidden; }
+    .result-group { display:block; margin-bottom:6px; font-size:9px; font-weight:1000; letter-spacing:.5px; color:#6a7164; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .result-photo { height:88px; border-radius:6px; overflow:hidden; background:#eef1ea; margin-bottom:6px; position:relative; display:grid; place-items:center; }
+    .result-photo img { width:100%; height:100%; display:block; object-fit:cover; }
+    .result-photo .result-placeholder { font-size:15px; font-weight:1000; color:#6c7863; }
+    .result-name { margin:0; font-size:11px; line-height:1.25; font-weight:1000; overflow-wrap:anywhere; word-break:keep-all; }
+    .result-en { margin:3px 0 0; color:#888e83; font-size:8px; line-height:1.2; font-weight:800; overflow-wrap:anywhere; }
+    .result-item.unselected { border:1px dashed #d7dcd2; background:rgba(255,255,255,.58); }
+    .result-item.unselected .result-photo { background:transparent; border:1px dashed #d7dcd2; }
+    .result-item.unselected .result-placeholder { font-size:8px; font-weight:900; letter-spacing:.6px; }
+    .sheet-footer { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:10px; padding-top:8px; border-top:1px solid #d9ddd4; color:#777d72; font-size:7px; font-weight:800; }
+    .sheet-footer b { color:#292e25; letter-spacing:.5px; }
+    .action-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:13px; }
+    .btn { border:0; border-radius:11px; padding:13px 10px; font-size:14px; font-weight:1000; transition:transform .15s, filter .15s; }
+    .btn:hover { transform:translateY(-1px); filter:brightness(.98); }
+    .btn-primary { background:var(--accent); color:#172113; box-shadow:0 3px 0 #c0e6b5; }
+    .btn-secondary { background:#f1f3ee; border:1px solid #e1e4dc; color:#343a30; }
+    .btn-wide { width:100%; margin-top:8px; }
+    .helper { color:#858a81; font-size:12px; line-height:1.65; margin:12px 1px 0; }
+    .notice { display:none; border:1px solid #d4e8ca; background:#f4fff0; color:#315326; padding:10px 12px; border-radius:10px; margin-top:12px; font-size:13px; line-height:1.6; }
+    .notice.show { display:block; }
+    .site-footer { display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-top:27px; padding-top:18px; border-top:1px solid #dfe2da; color:#858a81; font-size:12px; }
+    .site-footer b { color:#42483d; }
+    @media (max-width:1100px) {
+      .page { padding:20px; }
+      .workspace { grid-template-columns:minmax(0,1fr) minmax(290px,.78fr); gap:16px; }
+      .character-grid { grid-template-columns:repeat(4,minmax(0,1fr)); }
+    }
+    @media (max-width:820px) {
+      .workspace { grid-template-columns:1fr; }
+      .preview-sticky { position:static; }
+      .preview-card { max-width:640px; margin:0 auto; }
+      .result-photo { height:100px; }
+      .result-name { font-size:11px; }
+      .result-en { font-size:9px; }
+      .result-group { font-size:9px; }
+      .result-item { padding:8px; }
+      .sheet { padding:18px; }
+      .sheet-title { font-size:27px; }
+      .result-grid { gap:9px; }
+    }
+    @media (max-width:520px) {
+      .page { padding:14px 12px 36px; }
+      .topbar { align-items:flex-start; margin-bottom:17px; }
+      .quiet-pill { display:none; }
+      .hero { border-radius:20px; padding:21px 18px; align-items:flex-start; flex-direction:column; gap:17px; }
+      .hero:after { content:none; }
+      .progress-wrap { width:100%; min-width:0; }
+      .group-card { padding:13px; border-radius:16px; }
+      .character-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; }
+      .character-card { padding:5px 5px 8px; border-radius:11px; }
+      .character-card.selected { padding:4px 4px 7px; }
+      .char-ko { font-size:12px; }
+      .char-en { font-size:9px; }
+      .panel-heading { align-items:flex-start; flex-wrap:wrap; }
+      .search-box { width:100%; max-width:none; }
+      .result-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .result-photo { height:115px; }
+      .result-group { font-size:11px; }
+      .result-name { font-size:13px; }
+      .result-en { font-size:9px; }
+      .sheet { padding:14px; }
+      .sheet-title { font-size:25px; }
+      .self-choice-grid { grid-template-columns:1fr 1fr; }
+      .self-choice { align-items:flex-start; flex-direction:column; }
+      .self-choice .self-choice-photo { width:100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="workspace">
+      <section class="selector-panel">
+        <div class="panel-heading">
+          <div><h2>캐릭터 선택</h2><p>각 그룹에서 최애 한 명을 골라 주세요.</p></div>
+          <label class="search-box"><span class="search-icon">⌕</span><input id="searchInput" type="search" placeholder="캐릭터 이름 검색" autocomplete="off" aria-label="캐릭터 이름 검색"></label>
+        </div>
+        <section class="self-panel" aria-label="나 설정">
+          <h3 class="self-panel-title">나 설정</h3>
+          <p class="self-panel-description">닉네임을 입력하고, 내 카드에 표시할 주임 얼굴을 선택하세요.</p>
+          <label for="nicknameInput" class="self-nickname-label">내 닉네임</label>
+          <input id="nicknameInput" class="self-nickname-input" type="text" maxlength="24" placeholder="닉네임을 입력하세요" autocomplete="nickname">
+          <div class="self-choice-grid" id="self-choice-grid"></div>
+        </section>
+        <div id="group-container"></div>
+        <div class="empty-search" id="empty-search">검색 결과가 없어요. 다른 이름으로 검색해 보세요.</div>
+      </section>
+
+      <aside class="preview-panel">
+        <div class="preview-sticky">
+          <div class="preview-card">
+            <div class="preview-topline"><h2>완성 취향표</h2><span class="live-badge">LIVE PREVIEW</span></div>
+            <div class="sheet" id="result-sheet">
+              <div class="sheet-banner">
+                <div class="sheet-heading-content">
+                  <span class="mini-profile-photo" id="mini-profile-photo" data-portrait-id="momiji-hamasaki">
+                    <img alt="내 프로필 사진" data-photo-id="momiji-hamasaki" data-ext-index="0" src="assets/characters/momiji-hamasaki.png" onerror="handlePhotoError(this)" onload="handlePhotoLoad(this)">
+                    <span class="mini-profile-placeholder">나</span>
+                  </span>
+                  <div class="sheet-title" id="result-title">나의 18TRIP 취향표</div>
+                </div>
+              </div>
+              <div class="result-grid" id="result-grid"></div>
+              <div class="sheet-footer"><span><b>18TRIP 취향표</b></span><span id="generated-date">2026.10.14</span></div>
+            </div>
+            <div class="action-row">
+              <button class="btn btn-primary" id="save-button" type="button">↓ PNG 이미지 저장</button>
+              <button class="btn btn-secondary" id="reset-button" type="button">↺ 초기화</button>
+            </div>
+            <div class="notice" id="notice" role="status"></div>
+            <p class="helper">이미지 저장을 누르면 저장용 페이지가 열립니다. 이미지를 길게 누르면 저장할 수 있습니다.</p>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <footer class="site-footer"><span><b>18TRIP TASTE CHART</b> · fan-made personal use</span><span>이미지 파일은 <b>assets/characters/</b> 폴더에서 관리해요.</span></footer>
+  </main>
+
+  <script>
+    const GROUPS = [
+      { id: 'r1ze', name: 'R1ze', items: [
+        ['renga-nishizono','니시조노 렌가','RENGA NISHIZONO'], ['kafka-oguro','오오구로 카프카','KAFKA OGURO'], ['ten-murakumo','무라쿠모 텐','TEN MURAKUMO'], ['yukikaze-kamina','카미나 유키카제','YUKIKAZE KAMINA'], ['lu-liguang','루 리광','LU LIGUANG']
+      ]},
+      { id: 'day2', name: 'Day2', items: [
+        ['akuta-isotake','이소타케 아쿠타','AKUTA ISOTAKE'], ['kiroku-kinugawa','키누가와 키로쿠','KIROKU KINUGAWA'], ['nanaki-nanamegi','나나메기 나나키','NANAKI NANAMEGI'], ['muneuji-kaguya','카구야 무네우지','MUNEUJI KAGUYA'], ['ushio-kurama','쿠라마 우시오','USHIO KURAMA']
+      ]},
+      { id: 'ev3ns', name: 'Ev3ns', items: [
+        ['raito-kitakata','키타카타 라이토','RAITO KITAKATA'], ['kinari-azekawa','아제카와 키나리','KINARI AZEKAWA'], ['chihiro-natsuyaki','나츠야키 치히로','CHIHIRO NATSUYAKI'], ['tao-kinouchi','키노우치 타오','TAO KINOUCHI'], ['kuguri-domeki','도메키 쿠구리','KUGURI DOMEKI']
+      ]},
+      { id: 'l4mps', name: 'L4mps', items: [
+        ['nagi-hachinoya','하치노야 나기','NAGI HACHINOYA'], ['toi-shiramitsu','시라미츠 토이','TOI SHIRAMITSU'], ['ryui-shiramitsu','시라미츠 류이','RYUI SHIRAMITSU'], ['yodaka-natsume','나츠메 요다카','YODAKA NATSUME'], ['netaro-yowa','요와 네타로','NETARO YOWA']
+      ]},
+      { id: 'conductors', name: 'CONDUCTORS', items: [
+        ['yachiyo-fuefuki','후에후키 야치요','YACHIYO FUEFUKI'], ['sakujiro-karigane','카리가네 사쿠지로','SAKUJIRO KARIGANE'], ['nayuki-kitakata','키타카타 나유키','NAYUKI KITAKATA'], ['hiroshi-daniel-iwabuchi','이와부치 다니엘 히로시','HIROSHI DANIEL IWABUCHI']
+      ]},
+      { id: 'kobe', name: 'KOBE', items: [
+        ['tengen-koharu','텐겐 코하루','TENGEN KOHARU'], ['yuzuriha-kotonojo','유즈리하 코토노죠','YUZURIHA KOTONOJO'], ['oshikiri-minamo','오시키리 미나모','OSHIKIRI MINAMO'], ['canas-dogma','카나스 도그마','CANAS DOGMA'], ['haruma-unai','우나이 하루마','HARUMA UNAI'], ['marutsuka-nishiki','마루츠카 니시키','MARUTSUKA NISHIKI'], ['susugaya-komu','스스가야 코무','SUSUGAYA KOMU'], ['kushinada-amane','쿠시나다 아마네','KUSHINADA AMANE'], ['sanada-banji','사나다 반지','SANADA BANJI'], ['kira-suisei','키라 스이세이','KIRA SUISEI']
+      ]},
+      { id: 'other', name: '기타', items: [
+        ['shigematsu-hakkei','시게마츠 핫케이','SHIGEMATSU HAKKEI'], ['so-jun','소우 쥰','SO JUN'], ['yumenosuke-kuraku','쿠라쿠 유메노스케','YUMENOSUKE KURAKU'], ['kodama-tatsuji','코다마 타츠지','KODAMA TATSUJI'], ['yunyun','윤윤','YUNYUN'], ['other-custom','그 외 (직접 작성)','', true]
+      ]},
+      // 하마사키 모미지/카에데는 최애 그룹이 아니라 '나' 카드의 얼굴 선택지로 사용합니다.
+    ].map(group => ({ ...group, items: group.items.map(item => ({ id:item[0], ko:item[1], en:item[2], custom:!!item[3] })) }));
+
+    const EXTENSIONS = ['png', 'jpg', 'jpeg', 'webp'];
+    const selections = {};
+    const customEntry = { ko: '' };
+    const selfProfile = { nickname: '', portrait: 'momiji-hamasaki' };
+    const SELF_PORTRAITS = [
+      { id: 'momiji-hamasaki', ko: '하마사키 모미지' },
+      { id: 'kaede-hamasaki', ko: '하마사키 카에데' }
+    ];
+    const groupsRoot = document.getElementById('group-container');
+    const resultGrid = document.getElementById('result-grid');
+    const notice = document.getElementById('notice');
+
+    function escapeHTML(value) {
+      return String(value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    }
+    function initials(character) {
+      if (character.custom) return 'YOU';
+      const words = (character.en || character.ko || '').split(/\s+/).filter(Boolean);
+      return words.slice(0, 2).map(word => word[0]).join('').slice(0, 3) || '18T';
+    }
+    function selectedIds(group) {
+      const value = selections[group.id];
+      if (group.id === 'kobe') return Array.isArray(value) ? value : (value ? [value] : []);
+      return value ? [value] : [];
+    }
+    function koreanDate() {
+      const now = new Date();
+      return `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
+    }
+    function renderGroups() {
+      document.getElementById('self-choice-grid').innerHTML = SELF_PORTRAITS.map((portrait) => `
+        <button type="button" class="self-choice ${selfProfile.portrait === portrait.id ? 'selected' : ''}" data-self-photo="${portrait.id}" aria-pressed="${selfProfile.portrait === portrait.id ? 'true' : 'false'}">
+          <span class="self-choice-photo">
+            <img alt="${escapeHTML(portrait.ko)}" loading="lazy" data-photo-id="${portrait.id}" data-ext-index="0" src="assets/characters/${portrait.id}.png" onerror="handlePhotoError(this)">
+            <span class="portrait-placeholder"><span class="placeholder-monogram">${initials({en:portrait.ko})}</span><span class="placeholder-caption">ADD IMAGE</span></span>
+          </span>
+          <span class="self-choice-name">${escapeHTML(portrait.ko)}</span>
+        </button>`).join('');
+      groupsRoot.innerHTML = GROUPS.map((group, groupIndex) => `
+        <section class="group-card" data-group-card="${group.id}">
+          <div class="group-head">
+            <div class="group-name-wrap"><div class="group-index">${String(groupIndex + 1).padStart(2,'0')}</div><div><h3 class="group-name">${escapeHTML(group.name)}</h3>${group.id === 'kobe' ? '<div class="group-sub" style="display:block;margin-top:3px;color:#73776f;font-size:13px">최대 2명 선택 가능</div>' : ''}</div></div>
+            <span class="pick-state" id="state-${group.id}">선택 전</span>
+          </div>
+          <div class="character-grid">
+            ${group.items.map(character => `
+              <button type="button" class="character-card" data-group="${group.id}" data-character="${character.id}" aria-pressed="false" aria-label="${escapeHTML(character.ko)} 선택">
+                <span class="check-dot">✓</span>
+                <span class="portrait">
+                  <img alt="${escapeHTML(character.ko)}" loading="lazy" data-photo-id="${character.id}" data-ext-index="0" src="assets/characters/${character.id}.png" onerror="handlePhotoError(this)">
+                  <span class="portrait-placeholder"><span class="placeholder-monogram">${initials(character)}</span><span class="placeholder-caption">ADD IMAGE</span></span>
+                </span>
+                <span class="char-ko">${escapeHTML(character.ko)}</span><span class="char-en">${escapeHTML(character.en)}</span>
+              </button>`).join('')}
+          </div>
+          ${group.id === 'other' ? `
+            <div class="custom-fields" id="custom-fields">
+              <label for="custom-ko">캐릭터 이름</label><input id="custom-ko" class="custom-input" type="text" maxlength="32" placeholder="캐릭터 이름을 입력하세요" autocomplete="off">
+              <p class="custom-help">이미지를 넣으려면 파일명을 <b>other-custom.png</b>로 저장해서 assets/characters 폴더에 추가하세요.</p>
+            </div>` : ''}
+        </section>`).join('');
+      updateEverything();
+    }
+
+    function handlePhotoError(img) {
+      if (!img.parentElement) return;
+      const id = img.dataset.photoId;
+      const idx = Number(img.dataset.extIndex || 0);
+      if (idx + 1 < EXTENSIONS.length) {
+        img.dataset.extIndex = String(idx + 1);
+        img.src = `assets/characters/${id}.${EXTENSIONS[idx + 1]}`;
+      } else {
+        img.style.display = 'none';
+        const placeholder = img.parentElement.querySelector('.portrait-placeholder, .mini-profile-placeholder, .result-placeholder');
+        if (placeholder) placeholder.style.display = 'flex';
+      }
+    }
+    function handlePhotoLoad(img) {
+      if (!img.parentElement) return;
+      img.style.display = 'block';
+      const placeholder = img.parentElement.querySelector('.portrait-placeholder, .mini-profile-placeholder, .result-placeholder');
+      if (placeholder) placeholder.style.display = 'none';
+    }
+    document.addEventListener('load', event => {
+      if (event.target instanceof HTMLImageElement && event.target.dataset.photoId) handlePhotoLoad(event.target);
+    }, true);
+
+    function getCharacter(groupId, characterId) {
+      const group = GROUPS.find(item => item.id === groupId);
+      const character = group && group.items.find(item => item.id === characterId);
+      if (!character) return null;
+      if (character.custom) return { ...character, ko: customEntry.ko.trim() || '직접 작성 중', en: '' };
+      return character;
+    }
+    function updateEverything() {
+
+      const nickname = selfProfile.nickname.trim();
+      document.getElementById('result-title').textContent = nickname ? `${nickname}의 18TRIP 취향표` : '나의 18TRIP 취향표';
+      document.getElementById('generated-date').textContent = koreanDate();
+      const miniPhoto = document.getElementById('mini-profile-photo');
+      const portrait = SELF_PORTRAITS.find(item => item.id === selfProfile.portrait) || SELF_PORTRAITS[0];
+      if (miniPhoto.dataset.portraitId !== portrait.id) {
+        miniPhoto.dataset.portraitId = portrait.id;
+        miniPhoto.innerHTML = `<img alt="${escapeHTML(portrait.ko)}" data-photo-id="${portrait.id}" data-ext-index="0" src="assets/characters/${portrait.id}.png" onerror="handlePhotoError(this)" onload="handlePhotoLoad(this)"><span class="mini-profile-placeholder">나</span>`;
+      }
+
+      document.querySelectorAll('.self-choice').forEach(button => {
+        const picked = button.dataset.selfPhoto === selfProfile.portrait;
+        button.classList.toggle('selected', picked);
+        button.setAttribute('aria-pressed', picked ? 'true' : 'false');
+      });
+
+      GROUPS.forEach(group => {
+        const ids = selectedIds(group);
+        const state = document.getElementById(`state-${group.id}`);
+        if (state) {
+          state.textContent = group.id === 'kobe'
+            ? `${ids.length} / 2 선택`
+            : (ids.length ? '✓ 선택 완료' : '선택 전');
+          state.classList.toggle('done', ids.length > 0);
+        }
+        const section = document.querySelector(`[data-group-card="${group.id}"]`);
+        if (section) section.querySelectorAll('.character-card').forEach(button => {
+          const picked = ids.includes(button.dataset.character);
+          button.classList.toggle('selected', picked);
+          button.setAttribute('aria-pressed', picked ? 'true' : 'false');
+        });
+      });
+
+      const resultCards = [];
+      GROUPS.forEach(group => {
+        const ids = selectedIds(group);
+        if (!ids.length) {
+          resultCards.push(`<article class="result-item unselected">
+            <span class="result-group">${escapeHTML(group.name)}</span>
+            <div class="result-photo"><span class="result-placeholder">선택</span></div>
+            <p class="result-name">선택 대기 중</p>
+          </article>`);
+          return;
+        }
+        ids.forEach(id => {
+          const character = getCharacter(group.id, id);
+          if (!character) return;
+          resultCards.push(`<article class="result-item">
+            <span class="result-group">${escapeHTML(group.name)}</span>
+            <div class="result-photo"><img alt="${escapeHTML(character.ko)}" data-photo-id="${character.id}" data-ext-index="0" src="assets/characters/${character.id}.png" onerror="handlePhotoError(this)" onload="handleResultPhotoLoad(this)"><span class="result-placeholder">${escapeHTML(initials(character))}</span></div>
+            <p class="result-name">${escapeHTML(character.ko)}</p>
+          </article>`);
+        });
+      });
+      resultGrid.innerHTML = resultCards.join('');
+      const customFields = document.getElementById('custom-fields');
+      if (customFields) customFields.classList.toggle('visible', selections.other === 'other-custom');
+    }
+    function handleResultPhotoLoad(img) {
+      if (!img.parentElement) return;
+      img.style.display = 'block';
+      const placeholder = img.parentElement.querySelector('.portrait-placeholder, .mini-profile-placeholder, .result-placeholder');
+      if (placeholder) placeholder.style.display = 'none';
+    }
+    function showNotice(message) {
+      notice.textContent = message;
+      notice.classList.add('show');
+      window.clearTimeout(showNotice.timer);
+      showNotice.timer = window.setTimeout(() => notice.classList.remove('show'), 4200);
+    }
+
+    groupsRoot.addEventListener('click', event => {
+      const button = event.target.closest('.character-card');
+      if (!button) return;
+      const groupId = button.dataset.group;
+      const characterId = button.dataset.character;
+      if (groupId === 'kobe') {
+        const current = Array.isArray(selections.kobe) ? [...selections.kobe] : (selections.kobe ? [selections.kobe] : []);
+        const existingIndex = current.indexOf(characterId);
+        if (existingIndex >= 0) current.splice(existingIndex, 1);
+        else {
+          if (current.length >= 2) {
+            showNotice('KOBE는 최대 2명까지 선택할 수 있어요. 선택한 캐릭터를 눌러 해제한 뒤 다른 캐릭터를 골라 주세요.');
+            return;
+          }
+          current.push(characterId);
+        }
+        if (current.length) selections.kobe = current;
+        else delete selections.kobe;
+      } else {
+        if (selections[groupId] === characterId) delete selections[groupId];
+        else selections[groupId] = characterId;
+      }
+      updateEverything();
+    });
+    document.getElementById('nicknameInput').addEventListener('input', event => {
+      selfProfile.nickname = event.target.value;
+      updateEverything();
+    });
+    document.getElementById('self-choice-grid').addEventListener('click', event => {
+      const button = event.target.closest('[data-self-photo]');
+      if (!button) return;
+      selfProfile.portrait = button.dataset.selfPhoto;
+      updateEverything();
+    });
+    document.addEventListener('input', event => {
+      if (event.target.id === 'custom-ko') { customEntry.ko = event.target.value; updateEverything(); }
+    });
+    document.getElementById('searchInput').addEventListener('input', event => {
+      const query = event.target.value.trim().toLocaleLowerCase();
+      let visible = 0;
+      GROUPS.forEach(group => {
+        const section = document.querySelector(`[data-group-card="${group.id}"]`);
+        if (!section) return;
+        let groupVisible = 0;
+        section.querySelectorAll('.character-card').forEach(button => {
+          const character = getCharacter(group.id, button.dataset.character);
+          const haystack = `${character.ko} ${character.en} ${group.name}`.toLocaleLowerCase();
+          const match = !query || haystack.includes(query);
+          button.style.display = match ? '' : 'none';
+          if (match) groupVisible++;
+        });
+        section.style.display = groupVisible ? '' : 'none';
+        visible += groupVisible;
+      });
+      document.getElementById('empty-search').style.display = visible ? 'none' : 'block';
+    });
+
+    document.getElementById('reset-button').addEventListener('click', () => {
+      Object.keys(selections).forEach(key => delete selections[key]);
+      customEntry.ko = '';
+      selfProfile.nickname = ''; selfProfile.portrait = 'momiji-hamasaki';
+      document.getElementById('nicknameInput').value = '';
+      const customKo = document.getElementById('custom-ko');
+      if (customKo) customKo.value = '';
+      document.getElementById('searchInput').value = '';
+      document.querySelectorAll('[data-group-card]').forEach(el => el.style.display = '');
+      document.querySelectorAll('.character-card').forEach(el => el.style.display = '');
+      document.getElementById('empty-search').style.display = 'none';
+      updateEverything();
+      showNotice('선택을 모두 초기화했어요.');
+    });
+
+    function canvasRoundRect(ctx, x, y, width, height, radius, fill, stroke, lineWidth = 1) {
+      if (width <= 0 || height <= 0) return;
+      const r = Math.max(0, Math.min(radius || 0, width / 2, height / 2));
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + width, y, x + width, y + height, r);
+      ctx.arcTo(x + width, y + height, x, y + height, r);
+      ctx.arcTo(x, y + height, x, y, r);
+      ctx.arcTo(x, y, x + width, y, r);
+      ctx.closePath();
+      if (fill && fill !== 'transparent' && fill !== 'rgba(0, 0, 0, 0)') { ctx.fillStyle = fill; ctx.fill(); }
+      if (stroke && stroke !== 'transparent' && stroke !== 'rgba(0, 0, 0, 0)' && lineWidth > 0) {
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = lineWidth;
+        ctx.stroke();
+      }
+    }
+
+    function imageCanBeExported(img) {
+      if (!img || !img.complete || !img.naturalWidth || img.style.display === 'none') return false;
+      try {
+        const testCanvas = document.createElement('canvas');
+        testCanvas.width = testCanvas.height = 2;
+        const testCtx = testCanvas.getContext('2d');
+        testCtx.drawImage(img, 0, 0, 2, 2);
+        testCanvas.toDataURL('image/png');
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+
+    function drawCoverImage(ctx, img, x, y, width, height, radius) {
+      if (!imageCanBeExported(img)) return false;
+      ctx.save();
+      ctx.beginPath();
+      const r = Math.max(0, Math.min(radius || 0, width / 2, height / 2));
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + width, y, x + width, y + height, r);
+      ctx.arcTo(x + width, y + height, x, y + height, r);
+      ctx.arcTo(x, y + height, x, y, r);
+      ctx.arcTo(x, y, x + width, y, r);
+      ctx.closePath();
+      ctx.clip();
+      const sourceRatio = img.naturalWidth / img.naturalHeight;
+      const targetRatio = width / height;
+      let sx = 0, sy = 0, sw = img.naturalWidth, sh = img.naturalHeight;
+      if (sourceRatio > targetRatio) {
+        sw = img.naturalHeight * targetRatio;
+        sx = (img.naturalWidth - sw) / 2;
+      } else {
+        sh = img.naturalWidth / targetRatio;
+        sy = (img.naturalHeight - sh) / 2;
+      }
+      ctx.drawImage(img, sx, sy, sw, sh, x, y, width, height);
+      ctx.restore();
+      return true;
+    }
+
+    function rectInSheet(element, sheetRect) {
+      const rect = element.getBoundingClientRect();
+      return { x: rect.left - sheetRect.left, y: rect.top - sheetRect.top, width: rect.width, height: rect.height };
+    }
+
+    function styleRadius(style) {
+      return parseFloat(style.borderTopLeftRadius) || 0;
+    }
+
+    function drawStyledBox(ctx, element, sheetRect) {
+      if (!element) return;
+      const style = getComputedStyle(element);
+      const r = rectInSheet(element, sheetRect);
+      const borderWidth = parseFloat(style.borderTopWidth) || 0;
+      const borderColor = style.borderTopColor;
+      canvasRoundRect(ctx, r.x, r.y, r.width, r.height, styleRadius(style), style.backgroundColor, borderColor, borderWidth);
+    }
+
+    function drawTextElement(ctx, element, sheetRect, forcedAlign = null) {
+      if (!element) return;
+      const style = getComputedStyle(element);
+      if (style.display === 'none' || style.visibility === 'hidden') return;
+      const text = (element.innerText || element.textContent || '').trim();
+      if (!text) return;
+      const r = rectInSheet(element, sheetRect);
+      if (r.width <= 0 || r.height <= 0) return;
+      const fontSize = parseFloat(style.fontSize) || 12;
+      const weight = style.fontWeight || '700';
+      const family = style.fontFamily || 'sans-serif';
+      const lineHeight = style.lineHeight === 'normal' ? fontSize * 1.25 : (parseFloat(style.lineHeight) || fontSize * 1.25);
+      const align = forcedAlign || style.textAlign || 'left';
+      const paddingLeft = parseFloat(style.paddingLeft) || 0;
+      const paddingRight = parseFloat(style.paddingRight) || 0;
+      const maxWidth = Math.max(1, r.width - paddingLeft - paddingRight);
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(r.x, r.y, r.width, r.height);
+      ctx.clip();
+      ctx.font = `${weight} ${fontSize}px ${family}`;
+      ctx.fillStyle = style.color || '#171916';
+      ctx.textAlign = align === 'center' ? 'center' : (align === 'right' ? 'right' : 'left');
+      ctx.textBaseline = 'alphabetic';
+      const lines = [];
+      const rawLines = text.split(/\n/);
+      for (const raw of rawLines) {
+        let line = '';
+        for (const char of Array.from(raw)) {
+          if (line && ctx.measureText(line + char).width > maxWidth) {
+            lines.push(line);
+            line = char;
+          } else line += char;
+        }
+        if (line) lines.push(line);
+      }
+      const maxLines = Math.max(1, Math.floor((r.height + 1) / lineHeight));
+      const visibleLines = lines.slice(0, maxLines);
+      let startY = r.y + Math.max(fontSize, (r.height - visibleLines.length * lineHeight) / 2 + fontSize * 0.88);
+      const x = align === 'center' ? r.x + r.width / 2 : (align === 'right' ? r.x + r.width - paddingRight : r.x + paddingLeft);
+      visibleLines.forEach(line => {
+        ctx.fillText(line, x, startY, maxWidth);
+        startY += lineHeight;
+      });
+      ctx.restore();
+    }
+
+    function drawPhotoElement(ctx, element, sheetRect) {
+      if (!element) return;
+      const r = rectInSheet(element, sheetRect);
+      const style = getComputedStyle(element);
+      canvasRoundRect(ctx, r.x, r.y, r.width, r.height, styleRadius(style), style.backgroundColor || '#eef1ea', style.borderTopColor, parseFloat(style.borderTopWidth) || 0);
+      const img = element.querySelector('img');
+      if (img && imageCanBeExported(img)) {
+        drawCoverImage(ctx, img, r.x, r.y, r.width, r.height, styleRadius(style));
+        return;
+      }
+      const placeholder = element.querySelector('.result-placeholder, .mini-profile-placeholder');
+      if (placeholder && getComputedStyle(placeholder).display !== 'none') {
+        const ps = getComputedStyle(placeholder);
+        const text = (placeholder.innerText || placeholder.textContent || '').trim();
+        if (text) {
+          ctx.save();
+          ctx.fillStyle = ps.color || '#6c7863';
+          ctx.font = `${ps.fontWeight || 800} ${parseFloat(ps.fontSize) || 12}px ${ps.fontFamily || 'sans-serif'}`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(text, r.x + r.width / 2, r.y + r.height / 2, Math.max(1, r.width - 8));
+          ctx.restore();
+        }
+      }
+    }
+
+    function buildTasteChartCanvas() {
+      const sheet = document.getElementById('result-sheet');
+      const sheetRect = sheet.getBoundingClientRect();
+      if (!sheetRect.width || !sheetRect.height) throw new Error('취향표 미리보기를 찾을 수 없습니다. 화면을 새로고침한 뒤 다시 시도해 주세요.');
+      // Render from the live preview's measured positions so mobile/desktop layout matches.
+      const scale = 3;
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(sheetRect.width * scale);
+      canvas.height = Math.round(sheetRect.height * scale);
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error('이 브라우저에서 이미지 캔버스를 만들 수 없습니다.');
+      ctx.scale(scale, scale);
+      const sheetStyle = getComputedStyle(sheet);
+      canvasRoundRect(ctx, 0, 0, sheetRect.width, sheetRect.height, styleRadius(sheetStyle), sheetStyle.backgroundColor, sheetStyle.borderTopColor, parseFloat(sheetStyle.borderTopWidth) || 0);
+
+      const banner = sheet.querySelector('.sheet-banner');
+      if (banner) {
+        const bannerRect = rectInSheet(banner, sheetRect);
+        const bs = getComputedStyle(banner);
+        ctx.fillStyle = bs.borderBottomColor || '#4def00';
+        ctx.fillRect(bannerRect.x, bannerRect.y + bannerRect.height - (parseFloat(bs.borderBottomWidth) || 2), bannerRect.width, parseFloat(bs.borderBottomWidth) || 2);
+      }
+      drawPhotoElement(ctx, document.getElementById('mini-profile-photo'), sheetRect);
+      drawTextElement(ctx, document.getElementById('result-title'), sheetRect);
+
+      sheet.querySelectorAll('.result-item').forEach(item => {
+        drawStyledBox(ctx, item, sheetRect);
+        drawTextElement(ctx, item.querySelector('.result-group'), sheetRect);
+        drawPhotoElement(ctx, item.querySelector('.result-photo'), sheetRect);
+        drawTextElement(ctx, item.querySelector('.result-name'), sheetRect);
+      });
+
+      const footer = sheet.querySelector('.sheet-footer');
+      if (footer) {
+        const fr = rectInSheet(footer, sheetRect);
+        const fs = getComputedStyle(footer);
+        const borderTopWidth = parseFloat(fs.borderTopWidth) || 0;
+        if (borderTopWidth > 0) {
+          ctx.fillStyle = fs.borderTopColor || '#d9ddd4';
+          ctx.fillRect(fr.x, fr.y, fr.width, borderTopWidth);
+        }
+        drawTextElement(ctx, footer.querySelector('b'), sheetRect);
+        drawTextElement(ctx, document.getElementById('generated-date'), sheetRect);
+      }
+      return canvas;
+    }
+
+    document.getElementById('save-button').addEventListener('click', () => {
+      const imagePage = window.open('', '_blank');
+      if (!imagePage) {
+        showNotice('저장 페이지가 열리지 않았어요. 브라우저의 팝업 차단을 해제한 뒤 다시 눌러 주세요.');
+        return;
+      }
+      updateEverything();
+      const button = document.getElementById('save-button');
+      const oldText = button.textContent;
+      button.disabled = true;
+      button.textContent = '이미지 만드는 중…';
+      try {
+        const canvas = buildTasteChartCanvas();
+        const imageUrl = canvas.toDataURL('image/png');
+        imagePage.document.open();
+        imagePage.document.write(`<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>18TRIP 취향표 이미지 저장</title><style>
+          *{box-sizing:border-box}body{margin:0;padding:16px;background:#f0f1ef;color:#171916;font-family:system-ui,-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;text-align:center}.wrap{max-width:1000px;margin:0 auto}.title{font-size:22px;font-weight:900;margin:8px 0}.guide{font-size:15px;line-height:1.7;color:#5d6358;margin:0 auto 16px}.saved-image{display:block;width:100%;height:auto;border-radius:10px;box-shadow:0 4px 24px #0001;touch-action:manipulation;user-select:auto;-webkit-user-select:auto;-webkit-touch-callout:default}.download{margin:16px 0 8px;border:0;border-radius:12px;padding:14px 20px;font-size:16px;font-weight:800;background:#4def00;color:#171916}.note{font-size:13px;color:#777d72;margin-top:6px}
+          </style></head><body><main class="wrap"><div class="title">18TRIP 취향표</div><p class="guide">이미지를 길게 누르면 저장할 수 있습니다.<br>컴퓨터에서는 아래 다운로드 버튼을 이용해도 됩니다.</p><img class="saved-image" id="saved-image" alt="18TRIP 취향표"><a id="download-link" download="18TRIP-취향표.png" style="display:inline-block;text-decoration:none"><button class="download" type="button">이미지 파일 다운로드</button></a><p class="note">이미지를 길게 누르면 저장할 수 있습니다.</p></main></body></html>`);
+        imagePage.document.close();
+        imagePage.document.getElementById('saved-image').src = imageUrl;
+        imagePage.document.getElementById('download-link').href = imageUrl;
+        showNotice('저장용 이미지 페이지를 열었어요. 이미지를 길게 눌러 저장하세요.');
+      } catch (error) {
+        console.error(error);
+        imagePage.document.open();
+        imagePage.document.write(`<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>이미지 저장 안내</title></head><body style="font:16px system-ui,sans-serif;padding:24px;line-height:1.7"><h2>이미지를 만들지 못했어요.</h2><p>브라우저에서 이미지 생성이 차단되었을 수 있어요. GitHub Pages에 게시한 사이트 주소에서 다시 시도해 주세요.</p><p>오류: ${String(error && error.message || error).replace(/[<>]/g, '')}</p></body></html>`);
+        imagePage.document.close();
+        showNotice('이미지를 만들지 못했어요. GitHub Pages에 게시한 주소에서 다시 시도해 주세요.');
+      } finally {
+        button.disabled = false;
+        button.textContent = oldText;
+      }
+    });
+
+    renderGroups();
+  </script>
+</body>
+</html>
