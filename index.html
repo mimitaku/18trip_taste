@@ -227,7 +227,7 @@
       </aside>
     </div>
 
-    <footer class="site-footer"><span><b>18TRIP TASTE CHART</b> · fan-made personal use</span><span>이미지 파일은 <b>assets/characters/</b> 폴더에서 관리해요.</span></footer>
+    <footer class="site-footer"><span><b>18TRIP TASTE CHART</b> · fan-made personal use</span><span>해당 사이트는 <b>AI를 사용하여</b> 제작되었습니다.</span></footer>
   </main>
 
   <script>
@@ -645,6 +645,20 @@
       }
     }
 
+    async function waitForExportImages() {
+      // Wait for selected-character portraits to finish loading before drawing them to canvas.
+      // Do not call updateEverything() immediately before export: it replaces these <img> nodes.
+      const images = Array.from(document.querySelectorAll('#result-sheet img'));
+      await Promise.all(images.map(async img => {
+        for (let attempt = 0; attempt < 120; attempt++) {
+          if (!img.isConnected || img.style.display === 'none') return;
+          if (img.complete && img.naturalWidth > 0) return;
+          if (img.complete && img.naturalWidth === 0 && Number(img.dataset.extIndex || 0) >= EXTENSIONS.length - 1) return;
+          await new Promise(resolve => setTimeout(resolve, 50));
+        }
+      }));
+    }
+
     function buildTasteChartCanvas() {
       const sheet = document.getElementById('result-sheet');
       const sheetRect = sheet.getBoundingClientRect();
@@ -692,18 +706,18 @@
       return canvas;
     }
 
-    document.getElementById('save-button').addEventListener('click', () => {
+    document.getElementById('save-button').addEventListener('click', async () => {
       const imagePage = window.open('', '_blank');
       if (!imagePage) {
         showNotice('저장 페이지가 열리지 않았어요. 브라우저의 팝업 차단을 해제한 뒤 다시 눌러 주세요.');
         return;
       }
-      updateEverything();
       const button = document.getElementById('save-button');
       const oldText = button.textContent;
       button.disabled = true;
       button.textContent = '이미지 만드는 중…';
       try {
+        await waitForExportImages();
         const canvas = buildTasteChartCanvas();
         const imageUrl = canvas.toDataURL('image/png');
         imagePage.document.open();
