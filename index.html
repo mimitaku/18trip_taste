@@ -167,11 +167,17 @@
       .char-en { font-size:9px; }
       .panel-heading { align-items:flex-start; flex-wrap:wrap; }
       .search-box { width:100%; max-width:none; }
-      .result-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
-      .result-photo { height:115px; }
-      .result-group { font-size:11px; }
-      .result-name { font-size:13px; }
-      .result-en { font-size:9px; }
+
+      .result-grid {
+        grid-template-columns:repeat(4,minmax(0,1fr));
+        gap:5px;
+      }
+      .result-item { padding:4px; }
+      .result-photo { height:88px; }
+      .result-group { font-size:9px; }
+      .result-name { font-size:11px; }
+      .result-en { font-size:8px; }
+
       .sheet { padding:14px; }
       .sheet-title { font-size:25px; }
       .self-choice-grid { grid-template-columns:1fr 1fr; }
